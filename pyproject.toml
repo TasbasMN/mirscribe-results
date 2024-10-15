@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "mirscribe-results"
+version = "0.1.0"
+description = ""
+authors = ["tasbasmn <nazifts@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+paramiko = "^3.5.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
