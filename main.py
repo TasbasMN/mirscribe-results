@@ -1,62 +1,38 @@
+# main.py
+import os
 import argparse
-import paramiko
-from src.scripts import *
+from tqdm.auto import tqdm
+from scripts.pyensembl_operations import initialize_genome
+from scripts.data_processing import process_file
 
-def main():
-    parser = argparse.ArgumentParser(description="Traverse remote directory for .err files")
-    parser.add_argument("target_folder", nargs='?', default="slurm_logs", help="Target folder relative to home directory")
-    parser.add_argument("-l", "--local_path", default="logs", help="Local path to download the files (default: downloads)")
-    args = parser.parse_args()
+def find_input_files(folder_path: str) -> list:
+    """Find all CSV files in the specified folder."""
+    return [os.path.join(root, file) for root, _, files in os.walk(folder_path)
+            for file in files if file.endswith('.csv') and not file.endswith('case_2.csv')]
+
+def main(target_folder: str) -> None:
+    """Main function to process files."""
+    genome = initialize_genome(37)
+    input_files = find_input_files(target_folder)
+    successful_files = 0
     
-    
-
-    TARGET_FOLDER = os.path.join(HOME_FOLDER, args.target_folder)
-    TARGET_FOLDER_LAST = os.path.basename(TARGET_FOLDER)
-    
-    
-    try:
-        ssh = setup_ssh_connection(HOSTNAME, USERNAME, PASSWORD)
-        if ssh is None:
-            print("Failed to establish SSH connection.")
-            return
-
-        
-        successful_jobs = []
-        error_jobs = []        
-        
-        
-        with ssh.open_sftp() as sftp:
-        
-            print(f"Traversing the directory: {TARGET_FOLDER}")
-            traverse_directory_for_reports(sftp, TARGET_FOLDER, successful_jobs, error_jobs)
-            
-            
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-        # # Your SFTP operations here
-        # with ssh.open_sftp() as sftp:
-        #     # Example: List files in the target folder
-        #     print(f"Files in {TARGET_FOLDER}:")
-        #     for file in sftp.listdir(TARGET_FOLDER):
-        #         print(file)
-
-        # # Example: Run a command to find .err files
-        # cmd(ssh, f"find {TARGET_FOLDER} -name '*.err'")
-
-        ssh.close()
-        print("SSH connection closed.")
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    progress_bar = tqdm(total=len(input_files), desc="Overall progress")
+    for file_path in input_files:
+        try:
+            df = process_file(file_path, genome)
+            # Save the DataFrame to a parquet file
+            output_dir = f"results/{os.path.basename(target_folder)}"
+            os.makedirs(output_dir, exist_ok=True)
+            output_path = os.path.join(output_dir, f"{os.path.splitext(os.path.basename(file_path))[0]}.parquet")
+            df.to_parquet(output_path)
+            successful_files += 1
+            progress_bar.update(1)
+        except Exception as e:
+            progress_bar.write(f"Failed to process {os.path.basename(file_path)}: {str(e)}")
+    progress_bar.close()
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Process VCF files.")
+    parser.add_argument("target_folder", help="Path to the target folder containing VCF files.")
+    args = parser.parse_args()
+    main(args.target_folder)

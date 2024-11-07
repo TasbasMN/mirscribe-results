@@ -6,9 +6,18 @@ authors = ["tasbasmn <nazifts@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.10"
+tqdm = "^4.66.5"
 paramiko = "^3.5.0"
+pandas = "<2.1.0"
+pyarrow = "14.0.2"
+pyensembl = "^2.3.13"
+numpy = "<2.0.0"
+humanize = "^4.11.0"
 
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
 
 [build-system]
 requires = ["poetry-core"]
