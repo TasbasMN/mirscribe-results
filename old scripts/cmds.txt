@@ -1,3 +1,0 @@
-python 1_crawl_reports.py slurm_logs/PD8
-python 2_download_results.py mirscribe-vcf/results/PD8
-python 3_compare_logs.py downloads/PD8/download_successful.txt logs/PD8_run_successful.txt

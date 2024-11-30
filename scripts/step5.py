@@ -8,6 +8,7 @@ from scripts.globals import MUTSIG_PROBABILITIES
 from tqdm.auto import tqdm  # Change this import
 
 
+
 def filter_rows_with_same_prediction(df, threshold=0.5):
     mask = (df['wt_prediction'] >= threshold) != (df['mut_prediction'] >= threshold)
     return df[mask].reset_index(drop=True)
@@ -188,74 +189,74 @@ def finalize_processing(df):
 
 
 
-def crawl_and_import_results(folder_path, ending_string, db_path, table_name, assembly):
-    csv_files = []
+# def crawl_and_import_results(folder_path, ending_string, db_path, table_name, assembly):
+#     csv_files = []
 
-    # Find CSV files
-    for root, _, files in os.walk(folder_path):
-        csv_files.extend(
-            os.path.join(root, file)
-            for file in files
-            if file.endswith(f"{ending_string}.csv")
-        )
+#     # Find CSV files
+#     for root, _, files in os.walk(folder_path):
+#         csv_files.extend(
+#             os.path.join(root, file)
+#             for file in files
+#             if file.endswith(f"{ending_string}.csv")
+#         )
 
-    # Connect to SQLite database
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
+#     # Connect to SQLite database
+#     conn = sqlite3.connect(db_path)
+#     cursor = conn.cursor()
 
-    # Create table if it doesn't exist
-    cursor.execute(f"""
-        CREATE TABLE IF NOT EXISTS {table_name} (
-            id TEXT PRIMARY KEY,
-            wt_prediction REAL,
-            mut_prediction REAL,
-            pred_difference REAL,
-            vcf_id TEXT,
-            mirna_accession TEXT,
-            gene_id TEXT,
-            mutation_context TEXT,
-            mutsig TEXT,
-            is_intron BOOLEAN,
-            is_gain BOOLEAN,
-            is_gene_upregulated BOOLEAN
-        )
-    """)
+#     # Create table if it doesn't exist
+#     cursor.execute(f"""
+#         CREATE TABLE IF NOT EXISTS {table_name} (
+#             id TEXT PRIMARY KEY,
+#             wt_prediction REAL,
+#             mut_prediction REAL,
+#             pred_difference REAL,
+#             vcf_id TEXT,
+#             mirna_accession TEXT,
+#             gene_id TEXT,
+#             mutation_context TEXT,
+#             mutsig TEXT,
+#             is_intron BOOLEAN,
+#             is_gain BOOLEAN,
+#             is_gene_upregulated BOOLEAN
+#         )
+#     """)
 
-    # Import CSV files into the table
-    for file_path in csv_files:
+#     # Import CSV files into the table
+#     for file_path in csv_files:
         
-        df = apply_step_5(file_path, assembly, MUTSIG_PROBABILITIES)
+#         df = apply_step_5(file_path, assembly, MUTSIG_PROBABILITIES)
 
-        columns = ', '.join(df.columns)
-        placeholders = ', '.join(['?'] * len(df.columns))
+#         columns = ', '.join(df.columns)
+#         placeholders = ', '.join(['?'] * len(df.columns))
 
-        # Insert data into the table
-        for row in df.values:
-            cursor.execute(f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})", row)
+#         # Insert data into the table
+#         for row in df.values:
+#             cursor.execute(f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})", row)
 
-    # Commit changes and close the connection
-    conn.commit()
-    conn.close()
+#     # Commit changes and close the connection
+#     conn.commit()
+#     conn.close()
 
 
 
-def crawl_and_import_results_into_df(folder_path, ending_string, assembly):
-    csv_files = []
+# def crawl_and_import_results_into_df(folder_path, ending_string, assembly):
+#     csv_files = []
 
-    # Find CSV files
-    for root, _, files in os.walk(folder_path):
-        csv_files.extend(
-            os.path.join(root, file)
-            for file in files
-            if file.endswith(f"{ending_string}.csv")
-        )
+#     # Find CSV files
+#     for root, _, files in os.walk(folder_path):
+#         csv_files.extend(
+#             os.path.join(root, file)
+#             for file in files
+#             if file.endswith(f"{ending_string}.csv")
+#         )
 
-    # Create a list to store DataFrames
-    dataframes = []
+#     # Create a list to store DataFrames
+#     dataframes = []
 
-    # Process each CSV file
-    for file_path in csv_files:
-        df = apply_step_5(file_path, assembly, MUTSIG_PROBABILITIES)
-        dataframes.append(df)
+#     # Process each CSV file
+#     for file_path in csv_files:
+#         df = apply_step_5(file_path, assembly, MUTSIG_PROBABILITIES)
+#         dataframes.append(df)
 
-    return pd.concat(dataframes, ignore_index=True)
+#     return pd.concat(dataframes, ignore_index=True)
