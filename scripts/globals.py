@@ -6,6 +6,8 @@ def get_pyensembl_cache_location():
         return "/home/nazif/thesis/data"
     elif hostname == "Minerva":
         return "/home/yamak/Code/nazif/data"
+    elif hostname == 'nazos-MacBook-Air.local':
+        return "/Users/nazo/thesis/data"
     else:
         return "/truba/home/mtasbas/data"
 
