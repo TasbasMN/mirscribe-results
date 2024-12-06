@@ -3,4 +3,5 @@ results/
 wip/
 .DS_Store
 scripts/__pycache__/
-data/fasta
+data/fasta/
+data/560_vcfs/
