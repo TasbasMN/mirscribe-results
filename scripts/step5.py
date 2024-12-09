@@ -5,7 +5,6 @@ from scripts.globals import *
 import os
 import sqlite3
 from scripts.globals import MUTSIG_PROBABILITIES
-from tqdm.auto import tqdm  # Change this import
 
 
 
@@ -104,40 +103,33 @@ def generate_gene_id_column(df, assembly):
 
 
 def apply_step_5(file_path, assembly, mutsig_probabilities):
-    """Process a single VCF file with detailed progress tracking."""
-    
-    # Define processing steps for progress tracking
-    steps = [
-        ("Reading CSV", lambda _: pd.read_csv(file_path)),
-        ("Optimizing dtypes", optimize_dtypes),
-        ("Filtering rows", filter_rows_with_same_prediction),
-        ("Splitting ID column", split_id_column),
-        ("Converting categories", convert_categories),
-        ("Processing gene IDs", lambda df: process_gene_ids(df, assembly)),
-        ("Generating contexts", generate_contexts),
-        ("Finalizing", finalize_processing)
-    ]
-    
-    df = None
-    # Create progress bar for sub-steps
-    progress_bar = tqdm(total=len(steps), 
-                       desc=f"Processing {os.path.basename(file_path)}", 
-                       leave=False, 
-                       position=1)
-    
+    """Process a single VCF file."""
     try:
-        for step_name, step_func in steps:
-            progress_bar.set_description(f"{step_name: <20}")
-            try:
-                df = step_func(df) if df is not None else step_func(None)
-                progress_bar.update(1)
-            except Exception as e:
-                progress_bar.write(f"Error in {step_name}: {str(e)}")
-                raise
-    finally:
-        progress_bar.close()
-    
-    return df
+        # Read and process the file in sequence
+        df = pd.read_csv(file_path)
+        
+        # Basic preprocessing
+        df = optimize_dtypes(df)
+        df = filter_rows_with_same_prediction(df)
+        
+        # ID and category processing
+        df = split_id_column(df)
+        df = convert_categories(df)
+        
+        # Gene and context processing
+        df = process_gene_ids(df, assembly)
+        df = generate_contexts(df)
+        
+        # Final processing
+        df = finalize_processing(df)
+        
+        return df
+        
+    except Exception as e:
+        print(f"Error processing {os.path.basename(file_path)}: {str(e)}")
+        raise
+
+
 
 def optimize_dtypes(df):
     """Optimize datatypes for predictions."""
