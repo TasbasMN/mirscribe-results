@@ -2162,6 +2162,24 @@ files = [
 traitlets = "*"
 
 [[package]]
+name = "matplotlib-venn"
+version = "1.1.1"
+description = "Functions for plotting area-proportional two- and three-way Venn diagrams in matplotlib."
+optional = false
+python-versions = "*"
+files = [
+    {file = "matplotlib-venn-1.1.1.tar.gz", hash = "sha256:d885bc015f5091a4b8a8138ff20a7ed166c33b5c36dbc0489f95a5cbc76a2ae5"},
+]
+
+[package.dependencies]
+matplotlib = "*"
+numpy = "*"
+scipy = "*"
+
+[package.extras]
+shapely = ["shapely"]
+
+[[package]]
 name = "mccabe"
 version = "0.7.0"
 description = "McCabe checker, plugin for flake8"
@@ -4514,4 +4532,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "d592e480cc1684a3abc33ef0ac314397b2b251c1fe9c62bead31cec3cfa1269e"
+content-hash = "bfe08b57a40b1a927ae96e3bf23b51ba391a0c3d8583634afb519c662b5e525f"
