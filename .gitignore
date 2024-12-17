@@ -5,3 +5,4 @@ wip/
 scripts/__pycache__/
 data/fasta/
 data/560_vcfs/
+results.db
